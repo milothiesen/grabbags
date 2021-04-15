@@ -226,8 +226,8 @@ def validate_bag(bag_dir, args):
 def clean_bag(bag_dir):
     if not is_bag(bag_dir.path):
         LOGGER.warning(_("%s is not a bag. Not cleaning."), bag_dir.path)
+        not_a_bag.append(bag_dir.path)
         return
-
     bag = bagit.Bag(bag_dir.path)
     if bag.compare_manifests_with_fs()[1]:
         for payload_file in bag.compare_manifests_with_fs()[1]:
@@ -236,6 +236,7 @@ def clean_bag(bag_dir):
                 os.remove(os.path.join(bag_dir.path, payload_file))
             else:
                 LOGGER.info("Not removing system files from {}".format(bag_dir.path))
+        successes.append(bag_dir.path)
 
 
 def make_bag(bag_dir: "os.DirEntry[str]", args):
@@ -276,7 +277,7 @@ def run(args: argparse.Namespace):
             elif args.action_type == "clean":
                 try:
                     clean_bag(bag_dir)
-                    successes.append(bag_dir.path)
+                    # successes.append(bag_dir.path)
                 except bagit.BagError as error:
                     LOGGER.error(
                         _("%(bag)s cannot be cleaned: %(error)s"),
